@@ -66,11 +66,7 @@ enum class Screens(@StringRes val title: Int, val icon: ImageVector) {
 }
 
 @Composable
-fun App(
-    navController: NavHostController = rememberNavController(),
-    messagesViewModel: MessagesViewModel = viewModel(),
-    settingsViewModel: SettingsViewModel = viewModel()
-) {
+fun App(navController: NavHostController = rememberNavController()) {
     Scaffold(
         bottomBar = {
             NavigationBar(
@@ -116,15 +112,8 @@ fun App(
             startDestination = Screens.MessagesScreen.name,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(route = Screens.MessagesScreen.name) {
-                MessagesScreen(
-                    messagesList = messagesViewModel.messages,
-                    onSendButtonClicked = {messagesViewModel.sendMessage(it)})
-            }
-
-            composable(route = Screens.ConnectionSettingsScreen.name) {
-                ConnectionSettingsScreen()
-            }
+            composable(route = Screens.MessagesScreen.name) { MessagesScreen() }
+            composable(route = Screens.ConnectionSettingsScreen.name) { ConnectionSettingsScreen() }
         }
 
     }

@@ -10,7 +10,7 @@ class MessagesViewModel() : ViewModel() {
     public val messages: MutableLiveData<List<Message>> get() = _messages
 
     fun sendMessage(message: String) {
-        val msg = Message(message, Time(System.currentTimeMillis()), true)
+        val msg = Message(message, Time(System.currentTimeMillis()), false)
         _messages.value = _messages.value!!.plus(msg)
     }
 

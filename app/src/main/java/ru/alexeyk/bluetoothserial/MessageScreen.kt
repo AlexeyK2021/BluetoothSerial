@@ -27,31 +27,34 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.alexeyk.bluetoothserial.model.Message
+import ru.alexeyk.bluetoothserial.viewmodel.MessagesViewModel
 
 
 @Composable
 fun MessagesScreen(
-    messagesList: MutableLiveData<List<Message>>,
-    onSendButtonClicked: (String) -> Unit,
+//    messagesList: MutableLiveData<List<Message>>,
+//    onSendButtonClicked: (String) -> Unit,
     modifier: Modifier = Modifier,
+    messagesViewModel: MessagesViewModel = viewModel(),
 ) {
-
+    val msgs by  messagesViewModel.messages.observeAsState()
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        ShowMessages(messagesList)
+
+        ShowMessages(msgs)
         Spacer(modifier = modifier)
-        TextPanel(onSendButtonClicked)
+        TextPanel(/*onSendButtonClicked*/ messagesViewModel)
     }
 }
 
 @Composable
-fun ShowMessages(messagesList: MutableLiveData<List<Message>>) {
-    val msgs by  messagesList.observeAsState()
+fun ShowMessages(messagesList: List<Message>?) {
     LazyColumn(Modifier.fillMaxWidth()) {
-        items(msgs ?: emptyList()) { msg ->
+        items(messagesList ?: emptyList()) { msg ->
             Row {
                 val dir = if (msg.rx) " <-- " else " --> "
                 Text(text = msg.time.toString())
@@ -63,7 +66,9 @@ fun ShowMessages(messagesList: MutableLiveData<List<Message>>) {
 }
 
 @Composable
-fun TextPanel(onSendButtonClicked: (String) -> Unit, modifier: Modifier = Modifier) {
+fun TextPanel(/*onSendButtonClicked: (String) -> Unit,*/
+              messagesViewModel: MessagesViewModel,
+              modifier: Modifier = Modifier) {
     Row(modifier = modifier
         .fillMaxWidth()
         .height(50.dp)) {
@@ -75,7 +80,7 @@ fun TextPanel(onSendButtonClicked: (String) -> Unit, modifier: Modifier = Modifi
 
         Button(
             modifier = modifier.weight(0.25f).fillMaxHeight(),
-            shape = RectangleShape, onClick = { onSendButtonClicked(textValue.value); textValue.value = "" },
+            shape = RectangleShape, onClick = { messagesViewModel.sendMessage(textValue.value); textValue.value = "" },
         ) {
             Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
         }
