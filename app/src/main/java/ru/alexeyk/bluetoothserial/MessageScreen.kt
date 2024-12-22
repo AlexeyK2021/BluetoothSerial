@@ -1,5 +1,6 @@
 package ru.alexeyk.bluetoothserial
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,15 +26,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import ru.alexeyk.bluetoothserial.model.Message
 
 
 @Composable
 fun MessagesScreen(
-    messagesList: LiveData<List<Message>>,
+    messagesList: MutableLiveData<List<Message>>,
     onSendButtonClicked: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
@@ -44,10 +48,10 @@ fun MessagesScreen(
 }
 
 @Composable
-fun ShowMessages(messagesList: LiveData<List<Message>>) {
-    val msgs = messagesList.observeAsState()
+fun ShowMessages(messagesList: MutableLiveData<List<Message>>) {
+    val msgs by  messagesList.observeAsState()
     LazyColumn(Modifier.fillMaxWidth()) {
-        items(msgs.value ?: emptyList()) { msg ->
+        items(msgs ?: emptyList()) { msg ->
             Row {
                 val dir = if (msg.rx) " <-- " else " --> "
                 Text(text = msg.time.toString())

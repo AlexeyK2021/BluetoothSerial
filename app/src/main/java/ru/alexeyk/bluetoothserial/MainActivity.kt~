@@ -119,7 +119,7 @@ fun App(
             composable(route = Screens.MessagesScreen.name) {
                 MessagesScreen(
                     messagesList = messagesViewModel.messages,
-                    onSendButtonClicked = {messagesViewModel.sendMessage(it)})
+                    onSendButtonClicked = {})
             }
 
             composable(route = Screens.ConnectionSettingsScreen.name) {
