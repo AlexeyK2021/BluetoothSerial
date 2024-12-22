@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BluetoothSerial</string>
+    <string name="messages_screen_title">Messages Screen</string>
+    <string name="connection_settings_screen_title">Connection Settings</string>
 </resources>

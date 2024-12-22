@@ -1,43 +1,39 @@
 package ru.alexeyk.bluetoothserial
 
+import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import ru.alexeyk.bluetoothserial.model.Message
 import ru.alexeyk.bluetoothserial.ui.theme.BluetoothSerialTheme
+import ru.alexeyk.bluetoothserial.viewmodel.SettingsViewModel
 import java.sql.Time
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,70 +45,73 @@ class MainActivity : ComponentActivity() {
             Message("Test2", Time(1734605402L), false)
         )
         val messagesLiveData: MutableLiveData<List<Message>> = MutableLiveData(msg)
+
         setContent {
             BluetoothSerialTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MessagesScreen(
-                        messagesLiveData, onSendButtonClicked = {
-                            val newMessages = messagesLiveData.value!!.toMutableList()
-                            newMessages.add(Message(it, Time(System.currentTimeMillis()), false))
-                            messagesLiveData.value = newMessages
+//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+//                    MessagesScreen(
+//                        messagesLiveData, onSendButtonClicked = {
+//                            val newMessages = messagesLiveData.value!!.toMutableList()
+//                            newMessages.add(Message(it, Time(System.currentTimeMillis()), false))
+//                            messagesLiveData.value = newMessages
+//                        },
+//                        modifier = Modifier.padding(innerPadding)
+//                    )
+//                }
+                App()
+            }
+        }
+    }
+}
+
+enum class Screens(@StringRes val title: Int, val icon: ImageVector) {
+    MessagesScreen(R.string.messages_screen_title, Icons.AutoMirrored.Filled.Send),
+    ConnectionSettingsScreen(R.string.connection_settings_screen_title, Icons.Filled.Settings);
+}
+
+@Composable
+fun App(
+    navController: NavHostController = rememberNavController(),
+    settingsViewModel: SettingsViewModel = viewModel()
+) {
+    Scaffold(
+        bottomBar = {
+            BottomNavigation {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = navBackStackEntry?.destination
+
+                Screens.entries.forEach { screen ->
+                    BottomNavigationItem(
+                        icon = { Icon(imageVector = screen.icon, contentDescription = "") },
+                        selected = currentDestination?.route == screen.name,
+                        onClick = {
+                            navController.navigate(screen.name) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         },
-                        modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun MessagesScreen(
-    messagesList: LiveData<List<Message>>,
-    onSendButtonClicked: (String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        ShowMessages(messagesList)
-        Spacer(modifier = modifier)
-        TextPanel(onSendButtonClicked)
-    }
-}
-
-@Composable
-fun ShowMessages(messagesList: LiveData<List<Message>>) {
-    val msgs = messagesList.observeAsState()
-    LazyColumn(Modifier.fillMaxWidth()) {
-        items(msgs.value!!) { msg ->
-            Row {
-                val dir = if (msg.rx) " <-- " else " --> "
-                Text(text = msg.time.toString())
-                Text(text = dir)
-                Text(text = msg.text)
-            }
-        }
-    }
-}
-
-@Composable
-fun TextPanel(onSendButtonClicked: (String) -> Unit, modifier: Modifier = Modifier) {
-    Row(modifier = modifier
-        .fillMaxWidth()
-        .height(50.dp)) {
-
-        val textValue = remember{mutableStateOf("")}
-        TextField(textValue.value,
-            modifier = modifier.weight(0.75f).fillMaxHeight(),
-            onValueChange = { textValue.value = it })
-
-        Button(
-            modifier = modifier.weight(0.25f).fillMaxHeight(),
-            shape = RectangleShape, onClick = { onSendButtonClicked(textValue.value); textValue.value = "" },
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Screens.MessagesScreen.name,
+            modifier = Modifier.padding(innerPadding)
         ) {
-            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+            composable(route = Screens.MessagesScreen.name) {
+                MessagesScreen(
+                    messagesList = /*messagesLiveData*/ MutableLiveData<List<Message>>(),
+                    onSendButtonClicked = {})
+            }
+
+            composable(route = Screens.ConnectionSettingsScreen.name) {
+                ConnectionSettingsScreen()
+            }
         }
 
     }
@@ -126,17 +125,10 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun Preview1() {
-//    BluetoothSerialTheme {
-//        val innerPadding = 5.dp
-//        MessagesScreen(
-//            messagesList = listOf(
-//                Message("Test1", Time(1734605402L), true),
-//                Message("Test2", Time(1734605402L), false)
-//            ),
-//            onSendButtonClicked = {}
-//        )
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun Preview1() {
+    BluetoothSerialTheme {
+        App()
+    }
+}

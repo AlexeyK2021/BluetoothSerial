@@ -1,4 +1,4 @@
-package ru.alexeyk.bluetoothserial
+package ru.alexeyk.bluetoothserial.model
 
 import java.sql.Time
 
