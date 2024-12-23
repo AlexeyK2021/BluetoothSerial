@@ -66,14 +66,8 @@ fun Settings(settingsViewModel: SettingsViewModel = viewModel()) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            BaudRateDropDown(
-                initValue = BaudRate.Baud9600,
-                items = BaudRate.entries,
-                onSelectItem = { settingsViewModel.setBaudRate(it) })
-            StopBitsDropDown(
-                initValue = StopBits.One,
-                items = StopBits.entries,
-                onSelectItem = { settingsViewModel.setStopBits(it) })
+            BaudRateDropDown(initValue = BaudRate.Baud9600, items = BaudRate.entries, onSelectItem = { settingsViewModel.setBaudRate(it) })
+            StopBitsDropDown(initValue = StopBits.One, items = StopBits.entries, onSelectItem = { settingsViewModel.setStopBits(it) })
         }
     }
 }
@@ -92,11 +86,7 @@ enum class BaudRate(val value: Int) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BaudRateDropDown(
-    onSelectItem: (BaudRate) -> Unit,
-    initValue: BaudRate,
-    items: EnumEntries<BaudRate>
-) {
+fun BaudRateDropDown(onSelectItem: (BaudRate) -> Unit, initValue:BaudRate, items:EnumEntries<BaudRate>) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(initValue) }
 
@@ -139,11 +129,7 @@ enum class StopBits(val value: Int) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StopBitsDropDown(
-    onSelectItem: (StopBits) -> Unit,
-    initValue: StopBits,
-    items: EnumEntries<StopBits>
-) {
+fun StopBitsDropDown(onSelectItem: (StopBits) -> Unit, initValue:StopBits, items:EnumEntries<StopBits>) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(initValue) }
 

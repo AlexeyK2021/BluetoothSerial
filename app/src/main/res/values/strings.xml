@@ -2,4 +2,7 @@
     <string name="app_name">BluetoothSerial</string>
     <string name="messages_screen_title">Messages Screen</string>
     <string name="connection_settings_screen_title">Connection Settings</string>
+    <string name="baud_rate">Baud rate</string>
+    <string name="stop_bits">Stop bits</string>
+    <string name="bluetooth_device_mac">Bluetooth device</string>
 </resources>

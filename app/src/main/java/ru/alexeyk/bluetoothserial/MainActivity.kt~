@@ -46,11 +46,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-//        val msg = listOf(
-//            Message("Test1", Time(1734605402L), true),
-//            Message("Test2", Time(1734605402L), false)
-//        )
-//        val messagesLiveData: MutableLiveData<List<Message>> = MutableLiveData(msg)
+        val msg = listOf(
+            Message("Test1", Time(1734605402L), true),
+            Message("Test2", Time(1734605402L), false)
+        )
+        val messagesLiveData: MutableLiveData<List<Message>> = MutableLiveData(msg)
 
         setContent {
             BluetoothSerialTheme {
