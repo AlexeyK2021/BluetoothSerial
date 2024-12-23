@@ -59,7 +59,10 @@ fun Settings(settingsViewModel: SettingsViewModel = viewModel()) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            BluetoothDevicesDropdown()
+            BluetoothDevicesDropdown(
+                initValue = "",
+                items = listOf(""),
+                onSelectItem = { settingsViewModel.setMac(it) })
         }
         Spacer(Modifier.height(25.dp))
         Row(
@@ -70,6 +73,7 @@ fun Settings(settingsViewModel: SettingsViewModel = viewModel()) {
                 initValue = BaudRate.Baud9600,
                 items = BaudRate.entries,
                 onSelectItem = { settingsViewModel.setBaudRate(it) })
+
             StopBitsDropDown(
                 initValue = StopBits.One,
                 items = StopBits.entries,
@@ -181,9 +185,13 @@ fun StopBitsDropDown(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BluetoothDevicesDropdown(settingsViewModel: SettingsViewModel = viewModel()) {
+fun BluetoothDevicesDropdown(
+    onSelectItem: (String) -> Unit,
+    initValue: String,
+    items: List<String>
+) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(settingsViewModel.currentConnection.deviceMac) }
+    var selectedOption by remember { mutableStateOf(initValue) }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -202,16 +210,16 @@ fun BluetoothDevicesDropdown(settingsViewModel: SettingsViewModel = viewModel())
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
-//            StopBits.entries.forEach { stopBits ->
-//                DropdownMenuItem(
-//                    text = { Text(stopBits.value.toString()) },
-//                    onClick = {
-//                        selectedOption = stopBits
-//                        settingsViewModel.setStopBits(stopBits)
-//                        expanded = false
-//                    },
-//                )
-//            }
+            items.forEach {
+                DropdownMenuItem(
+                    text = { Text(it.toString()) },
+                    onClick = {
+                        selectedOption = it
+                        onSelectItem(it)
+                        expanded = false
+                    },
+                )
+            }
         }
     }
 
