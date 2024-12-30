@@ -1,6 +1,5 @@
 package ru.alexeyk.bluetoothserial
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,21 +24,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.alexeyk.bluetoothserial.model.Message
-import ru.alexeyk.bluetoothserial.viewmodel.MessagesViewModel
+import ru.alexeyk.bluetoothserial.viewmodel.BluetoothViewModel
 
 
 @Composable
 fun MessagesScreen(
-//    messagesList: MutableLiveData<List<Message>>,
-//    onSendButtonClicked: (String) -> Unit,
+    bluetoothViewModel: BluetoothViewModel,
     modifier: Modifier = Modifier,
-    messagesViewModel: MessagesViewModel = viewModel(),
 ) {
-    val msgs by  messagesViewModel.messages.observeAsState()
+    val msgs by  bluetoothViewModel.messages.observeAsState()
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
@@ -47,7 +42,9 @@ fun MessagesScreen(
 
         ShowMessages(msgs)
         Spacer(modifier = modifier)
-        TextPanel(/*onSendButtonClicked*/ messagesViewModel)
+        TextPanel(/*onSendButtonClicked*/ onSendButtonClicked = {
+            bluetoothViewModel.sendMessage(it)
+        })
     }
 }
 
@@ -66,8 +63,7 @@ fun ShowMessages(messagesList: List<Message>?) {
 }
 
 @Composable
-fun TextPanel(/*onSendButtonClicked: (String) -> Unit,*/
-              messagesViewModel: MessagesViewModel,
+fun TextPanel(onSendButtonClicked: (String) -> Unit,
               modifier: Modifier = Modifier) {
     Row(modifier = modifier
         .fillMaxWidth()
@@ -80,7 +76,7 @@ fun TextPanel(/*onSendButtonClicked: (String) -> Unit,*/
 
         Button(
             modifier = modifier.weight(0.25f).fillMaxHeight(),
-            shape = RectangleShape, onClick = { messagesViewModel.sendMessage(textValue.value); textValue.value = "" },
+            shape = RectangleShape, onClick = { onSendButtonClicked(textValue.value); textValue.value = "" },
         ) {
             Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
         }

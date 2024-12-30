@@ -1,20 +1,29 @@
 package ru.alexeyk.bluetoothserial
 
+import android.Manifest.permission.BLUETOOTH
+import android.Manifest.permission.BLUETOOTH_CONNECT
+import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,7 +35,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.MutableLiveData
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -34,28 +44,58 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import ru.alexeyk.bluetoothserial.model.Message
 import ru.alexeyk.bluetoothserial.ui.theme.BluetoothSerialTheme
-import ru.alexeyk.bluetoothserial.viewmodel.MessagesViewModel
-import ru.alexeyk.bluetoothserial.viewmodel.SettingsViewModel
-import java.sql.Time
+import ru.alexeyk.bluetoothserial.viewmodel.BluetoothViewModel
+import ru.alexeyk.bluetoothserial.viewmodel.BluetoothViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
+    private var btAdapter: BluetoothAdapter? = null
+    private lateinit var btLauncher: ActivityResultLauncher<Intent>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        requestPermission()
+        registerBtLauncher()
+        initBtAdapter()
 
-//        val msg = listOf(
-//            Message("Test1", Time(1734605402L), true),
-//            Message("Test2", Time(1734605402L), false)
-//        )
-//        val messagesLiveData: MutableLiveData<List<Message>> = MutableLiveData(msg)
-
+        val viewModel: BluetoothViewModel by viewModels { BluetoothViewModelFactory(btAdapter!!) }
         setContent {
             BluetoothSerialTheme {
-                App()
+                App(viewModel)
             }
+        }
+    }
+
+    private fun requestPermission() {
+        if (ContextCompat.checkSelfPermission(this, BLUETOOTH) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(this@MainActivity, arrayOf(BLUETOOTH, BLUETOOTH_CONNECT), 0)
+        }
+    }
+
+    private fun registerBtLauncher(){
+        btLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                Toast.makeText(this, "Bluetooth is enabled", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Bluetooth is not enabled", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun initBtAdapter(){
+        val btManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        btAdapter = btManager.adapter
+
+        if(btAdapter == null){
+            Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_SHORT).show()
+        }
+        else if(!btAdapter!!.isEnabled){
+            Toast.makeText(this, "Bluetooth is not enabled", Toast.LENGTH_SHORT).show()
+            btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
         }
     }
 }
@@ -66,7 +106,7 @@ enum class Screens(@StringRes val title: Int, val icon: ImageVector) {
 }
 
 @Composable
-fun App(navController: NavHostController = rememberNavController()) {
+fun App(btViewModel: BluetoothViewModel, navController: NavHostController = rememberNavController()) {
     Scaffold(
         bottomBar = {
             NavigationBar(
@@ -81,7 +121,8 @@ fun App(navController: NavHostController = rememberNavController()) {
                     NavigationBarItem(
                         icon = { Icon(imageVector = screen.icon, contentDescription = "") },
                         label = {
-                            Text(text = stringResource(screen.title),
+                            Text(
+                                text = stringResource(screen.title),
                                 fontSize = 10.sp
                             )
                         },
@@ -112,8 +153,8 @@ fun App(navController: NavHostController = rememberNavController()) {
             startDestination = Screens.MessagesScreen.name,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(route = Screens.MessagesScreen.name) { MessagesScreen() }
-            composable(route = Screens.ConnectionSettingsScreen.name) { ConnectionSettingsScreen() }
+            composable(route = Screens.MessagesScreen.name) { MessagesScreen(btViewModel) }
+            composable(route = Screens.ConnectionSettingsScreen.name) { ConnectionSettingsScreen(btViewModel) }
         }
 
     }
@@ -127,10 +168,10 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun Preview1() {
-    BluetoothSerialTheme {
-        App()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun Preview1() {
+//    BluetoothSerialTheme {
+//        App()
+//    }
+//}

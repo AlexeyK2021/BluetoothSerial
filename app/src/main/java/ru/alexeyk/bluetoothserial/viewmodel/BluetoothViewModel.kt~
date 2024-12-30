@@ -1,0 +1,70 @@
+package ru.alexeyk.bluetoothserial.viewmodel
+
+import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.util.Log
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import ru.alexeyk.bluetoothserial.BaudRate
+import ru.alexeyk.bluetoothserial.StopBits
+import ru.alexeyk.bluetoothserial.bluetooth.ConnectThread
+import ru.alexeyk.bluetoothserial.model.Connection
+import ru.alexeyk.bluetoothserial.model.Message
+import java.sql.Time
+
+class BluetoothViewModel(private val btAdapter: BluetoothAdapter): ViewModel() {
+
+    private val _messages: MutableLiveData<List<Message>> = MutableLiveData(listOf())
+    val messages: MutableLiveData<List<Message>> get() = _messages
+
+    private var currentConnection = Connection()
+    private  var connectThread: ConnectThread? = null
+
+    var isConnected: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    fun sendMessage(message: String) {
+        val msg = Message(message, Time(System.currentTimeMillis()), false)
+        _messages.value = _messages.value!!.plus(msg)
+    }
+
+    fun setBaudRate(baudRate: BaudRate) {
+        Log.d("BluetoothViewModel", "setBaudRate: $baudRate")
+        currentConnection.baudRate = baudRate
+    }
+
+    fun setMac(mac: String) {
+        Log.d("BluetoothViewModel", "setMAC: $mac")
+        currentConnection.deviceMac = mac
+    }
+
+    fun setStopBits(stopBits: StopBits) {
+        Log.d("BluetoothViewModel", "setStopBits: $stopBits")
+        currentConnection.stopBits = stopBits
+    }
+
+    fun connect() {
+        if(btAdapter.isEnabled && currentConnection.deviceMac.isNotEmpty()) {
+            Log.d("BluetoothViewModel", "connect: ${currentConnection.deviceMac}")
+            val device = btAdapter.getRemoteDevice(currentConnection.deviceMac)
+            connectThread = ConnectThread(device, onConnect = { isConnected.postValue(true)}, onDisconnect = { isConnected.postValue(false)})
+            connectThread?.start()
+        }
+    }
+
+    fun disconnect() {
+        connectThread?.closeConnection()
+    }
+
+    @SuppressLint("MissingPermission")
+    fun getPairedDevices(): Set<BluetoothDevice> {
+        val pairedDevices: Set<BluetoothDevice> = btAdapter.bondedDevices as Set<BluetoothDevice>
+//        pairedDevices.forEach { device ->
+//            val deviceName = device.name
+//            val deviceHardwareAddress = device.address
+//        }
+        return pairedDevices
+    }
+
+
+}

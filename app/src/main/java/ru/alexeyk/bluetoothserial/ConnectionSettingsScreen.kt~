@@ -1,5 +1,10 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package ru.alexeyk.bluetoothserial
 
+import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,40 +12,50 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ru.alexeyk.bluetoothserial.ui.theme.BluetoothSerialTheme
-import ru.alexeyk.bluetoothserial.viewmodel.SettingsViewModel
+import ru.alexeyk.bluetoothserial.viewmodel.BluetoothViewModel
 import kotlin.enums.EnumEntries
 
 
 @Composable
 fun ConnectionSettingsScreen(
+    bluetoothViewModel: BluetoothViewModel,
 ) {
-    Settings()
+    val paired = bluetoothViewModel.getPairedDevices()?.toList() ?: emptyList()
+    Settings(bluetoothViewModel)
 }
 
 @Composable
-fun Settings(settingsViewModel: SettingsViewModel = viewModel()) {
+fun Settings(bluetoothViewModel: BluetoothViewModel) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -55,29 +70,52 @@ fun Settings(settingsViewModel: SettingsViewModel = viewModel()) {
                 end = 16.dp
             )
     ) {
+        val connect = bluetoothViewModel.isConnected.observeAsState()
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp),
             horizontalArrangement = Arrangement.Center
         ) {
+            val devices = remember { bluetoothViewModel.getPairedDevices().toList() ?: emptyList() }
+
             BluetoothDevicesDropdown(
                 initValue = "",
-                items = listOf(""),
-                onSelectItem = { settingsViewModel.setMac(it) })
+                items = devices,
+                onSelectItem = { bluetoothViewModel.setMac(it) })
         }
         Spacer(Modifier.height(25.dp))
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             BaudRateDropDown(
                 initValue = BaudRate.Baud9600,
                 items = BaudRate.entries,
-                onSelectItem = { settingsViewModel.setBaudRate(it) })
-            
+                onSelectItem = { bluetoothViewModel.setBaudRate(it) })
             StopBitsDropDown(
                 initValue = StopBits.One,
                 items = StopBits.entries,
-                onSelectItem = { settingsViewModel.setStopBits(it) })
+                onSelectItem = { bluetoothViewModel.setStopBits(it) })
+        }
+        Row(modifier = Modifier.padding(20.dp)) {
+            Text(text = if (connect.value!!) "Device connected" else "Device disconnected")
+            VerticalDivider(Modifier.width(10.dp))
+            Icon(
+                imageVector = if (connect.value!!) Icons.Default.Check else Icons.Default.Close,
+                contentDescription = "Update devices",
+                modifier = Modifier.background(color = if (connect.value!!) Color.Green else Color.Red)
+            )
+        }
+        Button(
+            onClick = { if (connect.value!!) bluetoothViewModel.disconnect() else bluetoothViewModel.connect() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp)
+        ) {
+            Text(text = if (connect.value!!) "Disconnect" else "Connect")
         }
     }
 }
@@ -183,12 +221,12 @@ fun StopBitsDropDown(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("MissingPermission")
 @Composable
 fun BluetoothDevicesDropdown(
     onSelectItem: (String) -> Unit,
     initValue: String,
-    items: List<String>
+    items: List<BluetoothDevice>
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(initValue) }
@@ -212,10 +250,10 @@ fun BluetoothDevicesDropdown(
         ) {
             items.forEach {
                 DropdownMenuItem(
-                    text = { Text(it.toString()) },
+                    text = { Text("${it.name} (${it.address})") },
                     onClick = {
-                        selectedOption = it
-                        onSelectItem(it)
+                        selectedOption = it.name
+                        onSelectItem(it.address)
                         expanded = false
                     },
                 )
@@ -225,13 +263,13 @@ fun BluetoothDevicesDropdown(
 
 }
 
-@Preview(
-    showBackground = true, showSystemUi = true,
-    device = "spec:width=1080px,height=2340px,dpi=440,cutout=punch_hole,navigation=buttons"
-)
-@Composable
-fun PreviewSettings() {
-    BluetoothSerialTheme {
-        Settings()
-    }
-}
+//@Preview(
+//    showBackground = true, showSystemUi = true,
+//    device = "spec:width=1080px,height=2340px,dpi=440,cutout=punch_hole,navigation=buttons"
+//)
+//@Composable
+//fun PreviewSettings() {
+//    BluetoothSerialTheme {
+//        Settings()
+//    }
+//}
