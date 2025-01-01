@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,7 +20,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,7 +28,6 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -41,21 +38,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import ru.alexeyk.bluetoothserial.viewmodel.BluetoothConnectionState
 import ru.alexeyk.bluetoothserial.viewmodel.BluetoothViewModel
 import kotlin.enums.EnumEntries
 
-
 @Composable
-fun ConnectionSettingsScreen(
-    bluetoothViewModel: BluetoothViewModel,
-) {
-    val paired = bluetoothViewModel.getPairedDevices()?.toList() ?: emptyList()
-    Settings(bluetoothViewModel)
-}
-
-@Composable
-fun Settings(bluetoothViewModel: BluetoothViewModel) {
+fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -70,19 +58,21 @@ fun Settings(bluetoothViewModel: BluetoothViewModel) {
                 end = 16.dp
             )
     ) {
-        val connect = bluetoothViewModel.isConnected.observeAsState()
+        val connect = bluetoothViewModel.currentState.observeAsState()
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 20.dp),
             horizontalArrangement = Arrangement.Center
         ) {
-            val devices = remember { bluetoothViewModel.getPairedDevices().toList() ?: emptyList() }
-
+            val devices = remember { bluetoothViewModel.getPairedDevices().toList() }
             BluetoothDevicesDropdown(
                 initValue = "",
                 items = devices,
-                onSelectItem = { bluetoothViewModel.setMac(it) })
+                onSelectItem = { mac, name ->
+                    bluetoothViewModel.setMac(mac)
+                    bluetoothViewModel.setDeviceName(name)
+                })
         }
         Spacer(Modifier.height(25.dp))
         Row(
@@ -95,27 +85,52 @@ fun Settings(bluetoothViewModel: BluetoothViewModel) {
                 initValue = BaudRate.Baud9600,
                 items = BaudRate.entries,
                 onSelectItem = { bluetoothViewModel.setBaudRate(it) })
-            StopBitsDropDown(
-                initValue = StopBits.One,
-                items = StopBits.entries,
-                onSelectItem = { bluetoothViewModel.setStopBits(it) })
+            LineBreakDropDown(
+                initValue = LineBreak.CR_LF,
+                items = LineBreak.entries,
+                onSelectItem = { bluetoothViewModel.setLineBreak(it) })
         }
-        Row(modifier = Modifier.padding(20.dp)) {
-            Text(text = if (connect.value!!) "Device connected" else "Device disconnected")
+
+        Row(modifier = Modifier.padding(top = 25.dp)) {
+            Text(
+                text = when (connect.value) {
+                    BluetoothConnectionState.CONNECTED -> stringResource(R.string.device_connected)
+                    BluetoothConnectionState.DISCONNECTED -> stringResource(R.string.device_disconnected)
+                    else -> stringResource(R.string.connection_failed)
+                }
+            )
             Spacer(Modifier.width(20.dp))
             Icon(
-                imageVector = if (connect.value!!) Icons.Default.Check else Icons.Default.Close,
-                contentDescription = "Update devices",
-                modifier = Modifier.background(color = if (connect.value!!) Color.Green else Color.Red)
+                imageVector = when (connect.value) {
+                    BluetoothConnectionState.CONNECTED -> Icons.Default.Check
+                    else -> Icons.Default.Close
+                },
+                contentDescription = "Device connection status",
+                modifier = Modifier.background(
+                    color = when (connect.value) {
+                        BluetoothConnectionState.CONNECTED -> Color.Green
+                        else -> Color.Red
+                    }
+                )
             )
         }
         Button(
-            onClick = { if (connect.value!!) bluetoothViewModel.disconnect() else bluetoothViewModel.connect() },
+            onClick = {
+                when (connect.value) {
+                    BluetoothConnectionState.CONNECTED -> bluetoothViewModel.disconnect()
+                    else -> bluetoothViewModel.connect()
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 20.dp)
         ) {
-            Text(text = if (connect.value!!) "Disconnect" else "Connect")
+            Text(
+                text = when (connect.value) {
+                    BluetoothConnectionState.CONNECTED -> stringResource(R.string.disconnect)
+                    else -> stringResource(R.string.connect)
+                }
+            )
         }
     }
 }
@@ -179,12 +194,19 @@ enum class StopBits(val value: Int) {
     Two(2)
 }
 
+enum class LineBreak(val value: String) {
+    NONE("None"),
+    LF("LF"),
+    CR("CR"),
+    CR_LF("CR+LF")
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StopBitsDropDown(
-    onSelectItem: (StopBits) -> Unit,
-    initValue: StopBits,
-    items: EnumEntries<StopBits>
+fun LineBreakDropDown(
+    onSelectItem: (LineBreak) -> Unit,
+    initValue: LineBreak,
+    items: EnumEntries<LineBreak>
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(initValue) }
@@ -224,7 +246,7 @@ fun StopBitsDropDown(
 @SuppressLint("MissingPermission")
 @Composable
 fun BluetoothDevicesDropdown(
-    onSelectItem: (String) -> Unit,
+    onSelectItem: (String, String) -> Unit,
     initValue: String,
     items: List<BluetoothDevice>
 ) {
@@ -252,24 +274,12 @@ fun BluetoothDevicesDropdown(
                 DropdownMenuItem(
                     text = { Text("${it.name} (${it.address})") },
                     onClick = {
-                        selectedOption = it.name
-                        onSelectItem(it.address)
+                        selectedOption = "${it.name} (${it.address})"
+                        onSelectItem(it.address, it.name)
                         expanded = false
                     },
                 )
             }
         }
     }
-
 }
-
-//@Preview(
-//    showBackground = true, showSystemUi = true,
-//    device = "spec:width=1080px,height=2340px,dpi=440,cutout=punch_hole,navigation=buttons"
-//)
-//@Composable
-//fun PreviewSettings() {
-//    BluetoothSerialTheme {
-//        Settings()
-//    }
-//}

@@ -12,5 +12,4 @@
     <string name="device_disconnected">Device disconnected</string>
     <string name="disconnect">Disconnect</string>
     <string name="connect">Connect</string>
-    <string name="connection_failed">Connection failed</string>
 </resources>
