@@ -6,8 +6,6 @@ import android.bluetooth.BluetoothDevice
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ru.alexeyk.bluetoothserial.BaudRate
-import ru.alexeyk.bluetoothserial.StopBits
 import ru.alexeyk.bluetoothserial.ConnectThread
 import ru.alexeyk.bluetoothserial.LineBreak
 import ru.alexeyk.bluetoothserial.model.Connection
@@ -39,20 +37,20 @@ class BluetoothViewModel(private val btAdapter: BluetoothAdapter) : ViewModel() 
 //        _messages.value = _messages.value!!.plus(msg)
 //    }
 
-    fun setBaudRate(baudRate: BaudRate) {
-        Log.d("BluetoothViewModel", "setBaudRate: $baudRate")
-        currentConnection.baudRate = baudRate
-    }
+//    fun setBaudRate(baudRate: BaudRate) {
+//        Log.d("BluetoothViewModel", "setBaudRate: $baudRate")
+//        currentConnection.baudRate = baudRate
+//    }
 
     fun setMac(mac: String) {
         Log.d("BluetoothViewModel", "setMAC: $mac")
         currentConnection.deviceMac = mac
     }
 
-    fun setStopBits(stopBits: StopBits) {
-        Log.d("BluetoothViewModel", "setStopBits: $stopBits")
-        currentConnection.stopBits = stopBits
-    }
+//    fun setStopBits(stopBits: StopBits) {
+//        Log.d("BluetoothViewModel", "setStopBits: $stopBits")
+//        currentConnection.stopBits = stopBits
+//    }
 
     fun setLineBreak(lineBreak: LineBreak) {
         currentConnection.lineBreak = lineBreak
@@ -109,6 +107,10 @@ class BluetoothViewModel(private val btAdapter: BluetoothAdapter) : ViewModel() 
     fun getPairedDevices(): Set<BluetoothDevice> {
         val pairedDevices: Set<BluetoothDevice> = btAdapter.bondedDevices as Set<BluetoothDevice>
         return pairedDevices
+    }
+
+    fun clearMessaged() {
+        _messages.value = listOf()
     }
 
 }

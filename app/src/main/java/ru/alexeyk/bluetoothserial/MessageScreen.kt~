@@ -40,7 +40,7 @@ fun MessagesScreen(
     bluetoothViewModel: BluetoothViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val msgs by bluetoothViewModel.messages.observeAsState()
+    val msgs by  bluetoothViewModel.messages.observeAsState()
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
@@ -48,10 +48,10 @@ fun MessagesScreen(
 
         ShowMessages(msgs, modifier.fillMaxWidth().weight(1f, fill = false))
         Spacer(modifier = modifier)
-        TextPanel(
-            onSendButtonClicked = { bluetoothViewModel.sendMessage(it) },
-            onClearChatClicked = { bluetoothViewModel.clearMessaged() }
-        )
+        TextPanel(onSendButtonClicked = {
+            bluetoothViewModel.sendMessage(it)
+        },
+            onClearChatClicked = {bluetoothViewModel.clearMessaged()})
     }
 }
 
@@ -71,38 +71,26 @@ fun ShowMessages(messagesList: List<Message>?, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TextPanel(
-    onSendButtonClicked: (String) -> Unit,
-    onClearChatClicked: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(50.dp)
-    ) {
+fun TextPanel(onSendButtonClicked: (String) -> Unit,
+              onClearChatClicked: () -> Unit,
+              modifier: Modifier = Modifier) {
+    Row(modifier = modifier
+        .fillMaxWidth()
+        .height(50.dp)) {
 
-        Button(
-            modifier = modifier
-                .weight(0.25f)
-                .fillMaxHeight(),
+        Button(modifier = modifier.weight(0.25f).fillMaxHeight(),
             shape = RectangleShape, onClick = onClearChatClicked
         ) {
             Icon(Icons.Default.Delete, contentDescription = "Clear chat")
         }
-        val textValue = remember { mutableStateOf("") }
+        val textValue = remember{ mutableStateOf("") }
         TextField(textValue.value,
-            modifier = modifier
-                .weight(0.75f)
-                .fillMaxHeight(),
+            modifier = modifier.weight(0.75f).fillMaxHeight(),
             onValueChange = { textValue.value = it })
 
         Button(
-            modifier = modifier
-                .weight(0.25f)
-                .fillMaxHeight(),
-            shape = RectangleShape,
-            onClick = { onSendButtonClicked(textValue.value); textValue.value = "" },
+            modifier = modifier.weight(0.25f).fillMaxHeight(),
+            shape = RectangleShape, onClick = { onSendButtonClicked(textValue.value); textValue.value = "" },
         ) {
             Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
         }

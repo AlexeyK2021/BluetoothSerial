@@ -44,6 +44,7 @@ import kotlin.enums.EnumEntries
 
 @Composable
 fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
+    val devices = remember { bluetoothViewModel.getPairedDevices().toList() }
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -58,6 +59,7 @@ fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
                 end = 16.dp
             )
     ) {
+        val currConnection = bluetoothViewModel.currConnection
         val connect = bluetoothViewModel.currentState.observeAsState()
         Row(
             modifier = Modifier
@@ -65,10 +67,8 @@ fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
                 .padding(top = 20.dp),
             horizontalArrangement = Arrangement.Center
         ) {
-            val devices = remember { bluetoothViewModel.getPairedDevices().toList() }
-            val currDevice = bluetoothViewModel.currConnection.
             BluetoothDevicesDropdown(
-                initValue = "",
+                initValue = if (currConnection.deviceMac.isNotEmpty()) "${currConnection.deviceName} (${currConnection.deviceMac})" else "",
                 items = devices,
                 onSelectItem = { mac, name ->
                     bluetoothViewModel.setMac(mac)
@@ -82,12 +82,12 @@ fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
                 .padding(top = 20.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            BaudRateDropDown(
-                initValue = BaudRate.Baud9600,
-                items = BaudRate.entries,
-                onSelectItem = { bluetoothViewModel.setBaudRate(it) })
+//            BaudRateDropDown(
+//                initValue = BaudRate.Baud9600,
+//                items = BaudRate.entries,
+//                onSelectItem = { bluetoothViewModel.setBaudRate(it) })
             LineBreakDropDown(
-                initValue = LineBreak.CR_LF,
+                initValue = if (currConnection.deviceMac.isNotEmpty()) currConnection.lineBreak else LineBreak.CR_LF,
                 items = LineBreak.entries,
                 onSelectItem = { bluetoothViewModel.setLineBreak(it) })
         }
@@ -136,64 +136,64 @@ fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
     }
 }
 
-enum class BaudRate(val value: Int) {
-    Baud1200(1200),
-    Baud2400(2400),
-    Baud4800(4800),
-    Baud9600(9600),
-    Baud14400(14400),
-    Baud19200(19200),
-    Baud38400(38400),
-    Baud57600(57600),
-    Baud115200(115200)
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun BaudRateDropDown(
-    onSelectItem: (BaudRate) -> Unit,
-    initValue: BaudRate,
-    items: EnumEntries<BaudRate>
-) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(initValue) }
-
-    ExposedDropdownMenuBox(
-        modifier = Modifier.width(150.dp),
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-    ) {
-        TextField(
-            modifier = Modifier.menuAnchor(),
-            readOnly = true,
-            value = selectedOption.value.toString(),
-            onValueChange = {},
-            label = { Text(stringResource(R.string.baud_rate)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            items.forEach {
-                DropdownMenuItem(
-                    text = { Text(it.value.toString()) },
-                    onClick = {
-                        selectedOption = it
-                        onSelectItem(it)
-                        expanded = false
-                    },
-                )
-            }
-        }
-    }
-}
-
-enum class StopBits(val value: Int) {
-    One(1),
-    Two(2)
-}
+//enum class BaudRate(val value: Int) {
+//    Baud1200(1200),
+//    Baud2400(2400),
+//    Baud4800(4800),
+//    Baud9600(9600),
+//    Baud14400(14400),
+//    Baud19200(19200),
+//    Baud38400(38400),
+//    Baud57600(57600),
+//    Baud115200(115200)
+//}
+//
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun BaudRateDropDown(
+//    onSelectItem: (BaudRate) -> Unit,
+//    initValue: BaudRate,
+//    items: EnumEntries<BaudRate>
+//) {
+//    var expanded by remember { mutableStateOf(false) }
+//    var selectedOption by remember { mutableStateOf(initValue) }
+//
+//    ExposedDropdownMenuBox(
+//        modifier = Modifier.width(150.dp),
+//        expanded = expanded,
+//        onExpandedChange = { expanded = !expanded },
+//    ) {
+//        TextField(
+//            modifier = Modifier.menuAnchor(),
+//            readOnly = true,
+//            value = selectedOption.value.toString(),
+//            onValueChange = {},
+//            label = { Text(stringResource(R.string.baud_rate)) },
+//            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+//            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+//        )
+//        ExposedDropdownMenu(
+//            expanded = expanded,
+//            onDismissRequest = { expanded = false },
+//        ) {
+//            items.forEach {
+//                DropdownMenuItem(
+//                    text = { Text(it.value.toString()) },
+//                    onClick = {
+//                        selectedOption = it
+//                        onSelectItem(it)
+//                        expanded = false
+//                    },
+//                )
+//            }
+//        }
+//    }
+//}
+//
+//enum class StopBits(val value: Int) {
+//    One(1),
+//    Two(2)
+//}
 
 enum class LineBreak(val value: String) {
     NONE("None"),

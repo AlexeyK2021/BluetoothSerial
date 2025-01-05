@@ -90,7 +90,8 @@ class ConnectThread(
 //                }
                 val msg = socket?.inputStream?.read()!!
 
-                if(msg != 13 && msg != 10) buffer.add(msg.toByte())
+                if(msg != 13 && msg != 10)
+                    buffer.add(msg.toByte())
                 else if(msg == 13){
                     CrReaded = true
                     if(lineBreak == LineBreak.CR){
