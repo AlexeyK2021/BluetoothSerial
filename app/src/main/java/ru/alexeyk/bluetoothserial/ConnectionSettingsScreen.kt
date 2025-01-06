@@ -4,6 +4,7 @@ package ru.alexeyk.bluetoothserial
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
+import android.graphics.Paint.Align
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -34,6 +36,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -55,38 +58,32 @@ fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
                 bottom = WindowInsets.systemBars
                     .asPaddingValues()
                     .calculateBottomPadding(),
-                start = 16.dp,
-                end = 16.dp
-            )
+                start = 10.dp,
+                end = 10.dp
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val currConnection = bluetoothViewModel.currConnection
         val connect = bluetoothViewModel.currentState.observeAsState()
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            BluetoothDevicesDropdown(
-                initValue = if (currConnection.deviceMac.isNotEmpty()) "${currConnection.deviceName} (${currConnection.deviceMac})" else "",
-                items = devices,
-                onSelectItem = { mac, name ->
-                    bluetoothViewModel.setMac(mac)
-                    bluetoothViewModel.setDeviceName(name)
-                })
-        }
+        BluetoothDevicesDropdown(
+            initValue = if (currConnection.deviceMac.isNotEmpty()) "${currConnection.deviceName} (${currConnection.deviceMac})"
+                        else "",
+            items = devices,
+            onSelectItem = { mac, name ->
+                bluetoothViewModel.setMac(mac)
+                bluetoothViewModel.setDeviceName(name)
+            },
+//             modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
         Spacer(Modifier.height(25.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            LineBreakDropDown(
-                initValue = if (currConnection.deviceMac.isNotEmpty()) currConnection.lineBreak else LineBreak.CR_LF,
-                items = LineBreak.entries,
-                onSelectItem = { bluetoothViewModel.setLineBreak(it) })
-        }
+
+        LineBreakDropDown(
+            initValue = if (currConnection.deviceMac.isNotEmpty()) currConnection.lineBreak else LineBreak.CR_LF,
+            items = LineBreak.entries,
+            onSelectItem = { bluetoothViewModel.setLineBreak(it) },
+//            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
 
         Row(modifier = Modifier.padding(top = 25.dp)) {
             Text(
@@ -96,7 +93,9 @@ fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
                     else -> stringResource(R.string.connection_failed)
                 }
             )
+
             Spacer(Modifier.width(20.dp))
+
             Icon(
                 imageVector = when (connect.value) {
                     BluetoothConnectionState.CONNECTED -> Icons.Default.Check
@@ -203,13 +202,14 @@ enum class LineBreak(val value: String) {
 fun LineBreakDropDown(
     onSelectItem: (LineBreak) -> Unit,
     initValue: LineBreak,
-    items: EnumEntries<LineBreak>
+    items: EnumEntries<LineBreak>,
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(initValue) }
 
     ExposedDropdownMenuBox(
-        modifier = Modifier.width(150.dp),
+        modifier = modifier,
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
     ) {
@@ -245,12 +245,14 @@ fun LineBreakDropDown(
 fun BluetoothDevicesDropdown(
     onSelectItem: (String, String) -> Unit,
     initValue: String,
-    items: List<BluetoothDevice>
+    items: List<BluetoothDevice>,
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(initValue) }
 
     ExposedDropdownMenuBox(
+        modifier = modifier,
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
     ) {
@@ -265,7 +267,7 @@ fun BluetoothDevicesDropdown(
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
+            onDismissRequest = { expanded = false }
         ) {
             items.forEach {
                 DropdownMenuItem(
