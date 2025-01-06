@@ -1,6 +1,6 @@
 package ru.alexeyk.bluetoothserial.model
 
-import ru.alexeyk.bluetoothserial.LineBreak
+import ru.alexeyk.bluetoothserial.screens.LineBreak
 
 
 data class Connection(

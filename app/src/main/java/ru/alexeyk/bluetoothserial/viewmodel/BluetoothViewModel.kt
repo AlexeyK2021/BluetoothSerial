@@ -7,7 +7,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.alexeyk.bluetoothserial.ConnectThread
-import ru.alexeyk.bluetoothserial.LineBreak
+import ru.alexeyk.bluetoothserial.screens.LineBreak
 import ru.alexeyk.bluetoothserial.model.Connection
 import ru.alexeyk.bluetoothserial.model.Message
 import java.sql.Time

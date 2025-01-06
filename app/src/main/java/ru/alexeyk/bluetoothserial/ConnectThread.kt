@@ -3,6 +3,7 @@ package ru.alexeyk.bluetoothserial
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.util.Log
+import ru.alexeyk.bluetoothserial.screens.LineBreak
 import ru.alexeyk.bluetoothserial.viewmodel.BluetoothConnectionState
 import java.io.IOException
 import java.util.UUID
