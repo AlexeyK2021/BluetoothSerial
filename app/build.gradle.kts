@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "ru.alexeyk.bluetoothserial"
-        minSdk = 25
+        minSdk = 21
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -50,7 +50,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material)
-    implementation(libs.bluetoothspp)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.navigation.compose)

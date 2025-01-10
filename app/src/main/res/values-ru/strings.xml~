@@ -15,5 +15,4 @@
     <string name="connection_failed">Ошибка подключения</string>
     <string name="stop_bits">Стоповые биты</string>
     <string name="message_time">Message time</string>
-    <string name="message_parse_error">JSON message parse error</string>
 </resources>

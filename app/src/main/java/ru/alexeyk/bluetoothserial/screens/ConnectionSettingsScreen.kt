@@ -195,7 +195,6 @@ enum class LineBreak(val value: String) {
     CR_LF("CR+LF")
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LineBreakDropDown(
     onSelectItem: (LineBreak) -> Unit,

@@ -13,4 +13,7 @@
     <string name="connect">Connect</string>
     <string name="connection_failed">Connection failed</string>
     <string name="json_screen_title" translatable="false">JSON</string>
+    <string name="stop_bits">Stop bits</string>
+    <string name="message_time">Message time</string>
+    <string name="message_parse_error">JSON message parse error</string>
 </resources>

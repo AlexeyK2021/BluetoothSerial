@@ -53,6 +53,7 @@ class BluetoothViewModel(private val btAdapter: BluetoothAdapter) : ViewModel() 
 //    }
 
     fun setLineBreak(lineBreak: LineBreak) {
+        Log.d("BluetoothViewModel", "Set Line Break: $lineBreak")
         currentConnection.lineBreak = lineBreak
     }
 

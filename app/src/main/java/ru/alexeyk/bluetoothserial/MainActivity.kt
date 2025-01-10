@@ -115,7 +115,7 @@ fun App(
     Scaffold(
         bottomBar = {
             NavigationBar(
-                containerColor = Color.DarkGray,
+                containerColor = Color.DarkGray,  //TODO("Перенести все цвета в ui.theme.Theme")
                 contentColor = Color.LightGray
             ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
