@@ -216,7 +216,7 @@ fun LineBreakDropDown(
             readOnly = true,
             value = selectedOption.value.toString(),
             onValueChange = {},
-            label = { Text(stringResource(R.string.stop_bits)) },
+            label = { Text(stringResource(R.string.line_break)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
         )

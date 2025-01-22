@@ -61,8 +61,7 @@ fun ShowMessages(messagesList: List<Message>?, modifier: Modifier = Modifier) {
     val cs = rememberCoroutineScope()
 
     cs.launch {
-        val index = if (messagesList.isNullOrEmpty()) 0 else messagesList.size.minus(1)
-        lazyListState.scrollToItem(index)
+        lazyListState.scrollToItem(messagesList?.size?.minus(1) ?: 0)
     }
     LazyColumn(modifier = modifier, state = lazyListState) {
         items(messagesList ?: emptyList()) { msg ->
