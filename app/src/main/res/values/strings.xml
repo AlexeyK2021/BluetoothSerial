@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">BluetoothSerial</string>
+    <string name="app_name" translatable="false">Bluetooth Serial</string>
     <string name="messages_screen_title">Messages Screen</string>
     <string name="connection_settings_screen_title">Connection Settings</string>
     <string name="baud_rate">Baud rate</string>

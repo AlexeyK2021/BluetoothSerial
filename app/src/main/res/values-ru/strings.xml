@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="messages_screen_title">Сообщения</string>
+    <string name="connection_settings_screen_title">Подключение</string>
+    <string name="baud_rate">Скорость (бод/с)</string>
+    <string name="bluetooth_device_mac">MAC-адрес</string>
+    <string name="bluetooth_is_enabled">Bluetooth включен</string>
+    <string name="bluetooth_is_not_enabled">Bluetooth выключен</string>
+    <string name="bluetooth_is_not_available">Bluetooth недоступен</string>
+    <string name="device_connected">Устройство подключено</string>
+    <string name="device_disconnected">Устройство не подключено</string>
+    <string name="disconnect">Отключиться</string>
+    <string name="connect">Подключиться</string>
+    <string name="connection_failed">Ошика подключения</string>
+</resources>
