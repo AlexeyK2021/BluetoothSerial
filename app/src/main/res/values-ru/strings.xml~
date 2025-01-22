@@ -12,5 +12,5 @@
     <string name="disconnect">Отключиться</string>
     <string name="connect">Подключиться</string>
     <string name="connection_failed">Ошика подключения</string>
-    <string name="line_break">Конец строки</string>
+    <string name="line_break">Символ конца строки</string>
 </resources>

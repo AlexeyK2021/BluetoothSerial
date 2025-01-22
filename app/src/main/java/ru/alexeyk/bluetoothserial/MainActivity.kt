@@ -19,8 +19,10 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.sharp.Email
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -42,10 +44,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.compose.AppTheme
 import ru.alexeyk.bluetoothserial.screens.ConnectionSettingsScreen
-import ru.alexeyk.bluetoothserial.screens.JsonScreen
 import ru.alexeyk.bluetoothserial.screens.MessagesScreen
-import ru.alexeyk.bluetoothserial.ui.theme.BluetoothSerialTheme
 import ru.alexeyk.bluetoothserial.viewmodel.BluetoothViewModel
 import ru.alexeyk.bluetoothserial.viewmodel.BluetoothViewModelFactory
 
@@ -63,7 +64,7 @@ class MainActivity : ComponentActivity() {
 
         val viewModel: BluetoothViewModel by viewModels { BluetoothViewModelFactory(btAdapter!!) }
         setContent {
-            BluetoothSerialTheme {
+            AppTheme {
                 App(viewModel)
             }
         }
@@ -102,9 +103,9 @@ class MainActivity : ComponentActivity() {
 }
 
 enum class Screens(@StringRes val title: Int, val icon: ImageVector) {
-    MessagesScreen(R.string.messages_screen_title, Icons.AutoMirrored.Filled.Send),
-    JsonScreen(R.string.json_screen_title, Icons.Filled.Menu),
-    ConnectionSettingsScreen(R.string.connection_settings_screen_title, Icons.Filled.Settings);
+    MessagesScreen(R.string.messages_screen_title, Icons.Rounded.Email),
+//    JsonScreen(R.string.json_screen_title, Icons.Filled.Menu),
+    ConnectionSettingsScreen(R.string.connection_settings_screen_title, Icons.Rounded.Settings)
 }
 
 @Composable
@@ -115,8 +116,8 @@ fun App(
     Scaffold(
         bottomBar = {
             NavigationBar(
-                containerColor = Color.DarkGray,
-                contentColor = Color.LightGray
+//                containerColor = ,
+//                contentColor = Color.Gray
             ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
@@ -140,12 +141,12 @@ fun App(
                                 restoreState = true
                             }
                         },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.LightGray,
-                            selectedTextColor = Color.LightGray,
-                            unselectedIconColor = Color.Gray,
-                            unselectedTextColor = Color.Gray
-                        )
+//                        colors = NavigationBarItemDefaults.colors(
+//                            selectedIconColor = Color.LightGray,
+//                            selectedTextColor = Color.LightGray,
+//                            unselectedIconColor = Color.Gray,
+//                            unselectedTextColor = Color.Gray
+//                        )
                     )
                 }
             }
@@ -157,7 +158,7 @@ fun App(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = Screens.MessagesScreen.name) { MessagesScreen(btViewModel) }
-            composable(route = Screens.JsonScreen.name){ JsonScreen(btViewModel) }
+//            composable(route = ru.alexeyk.bluetoothserial.Screens.JsonScreen.name){ JsonScreen(btViewModel) }
             composable(route = Screens.ConnectionSettingsScreen.name) { ConnectionSettingsScreen(btViewModel) }
         }
 

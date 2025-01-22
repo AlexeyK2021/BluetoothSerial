@@ -13,9 +13,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -64,6 +67,7 @@ fun ShowMessages(messagesList: List<Message>?, modifier: Modifier = Modifier) {
         val index = if (messagesList.isNullOrEmpty()) 0 else messagesList.size.minus(1)
         lazyListState.scrollToItem(index)
     }
+
     LazyColumn(modifier = modifier, state = lazyListState) {
         items(messagesList ?: emptyList()) { msg ->
             Row {
@@ -89,14 +93,14 @@ fun TextPanel(
             .height(50.dp)
     ) {
 
-        Button(
-            modifier = modifier
-                .weight(0.25f)
-                .fillMaxHeight(),
-            shape = RectangleShape, onClick = onClearChatClicked
-        ) {
-            Icon(Icons.Default.Delete, contentDescription = "Clear chat")
-        }
+//        Button(
+//            modifier = modifier
+//                .weight(0.25f)
+//                .fillMaxHeight(),
+//            shape = RectangleShape, onClick = onClearChatClicked
+//        ) {
+//            Icon(Icons.Default.Delete, contentDescription = "Clear chat")
+//        }
         val textValue = remember { mutableStateOf("") }
         TextField(textValue.value,
             modifier = modifier
@@ -106,12 +110,12 @@ fun TextPanel(
 
         Button(
             modifier = modifier
-                .weight(0.25f)
+                .weight(0.15f)
                 .fillMaxHeight(),
-            shape = RectangleShape,
+            shape = RoundedCornerShape(10),
             onClick = { onSendButtonClicked(textValue.value); textValue.value = "" },
         ) {
-            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+            Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "Send")
         }
 
     }

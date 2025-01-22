@@ -11,6 +11,6 @@
     <string name="device_disconnected">Устройство не подключено</string>
     <string name="disconnect">Отключиться</string>
     <string name="connect">Подключиться</string>
-    <string name="connection_failed">Ошика подключения</string>
+    <string name="connection_failed">Ошибка подключения</string>
     <string name="line_break">Символ конца строки</string>
 </resources>

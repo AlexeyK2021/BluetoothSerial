@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -14,8 +15,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -63,6 +66,7 @@ fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
     ) {
         val currConnection = bluetoothViewModel.currConnection
         val connect = bluetoothViewModel.currentState.observeAsState()
+
         BluetoothDevicesDropdown(
             initValue = if (currConnection.deviceMac.isNotEmpty()) "${currConnection.deviceName} (${currConnection.deviceMac})"
                         else "",
@@ -115,7 +119,8 @@ fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 20.dp)
+                .padding(top = 20.dp),
+            shape = RoundedCornerShape(10)
         ) {
             Text(
                 text = when (connect.value) {
@@ -157,7 +162,7 @@ fun LineBreakDropDown(
             onValueChange = {},
             label = { Text(stringResource(R.string.line_break)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+//            colors = ExposedDropdownMenuDefaults.textFieldColors(),
         )
         ExposedDropdownMenu(
             expanded = expanded,
@@ -200,7 +205,7 @@ fun BluetoothDevicesDropdown(
             onValueChange = {},
             label = { Text(stringResource(R.string.bluetooth_device_mac)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+//            colors = ExposedDropdownMenuDefaults.textFieldColors(),
         )
         ExposedDropdownMenu(
             expanded = expanded,
