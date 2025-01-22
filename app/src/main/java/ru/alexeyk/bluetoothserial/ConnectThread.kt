@@ -8,12 +8,6 @@ import ru.alexeyk.bluetoothserial.viewmodel.BluetoothConnectionState
 import java.io.IOException
 import java.util.UUID
 
-enum class ReadState{
-    READ_DATA,
-    READ_CR,
-    READ_LF
-}
-
 class ConnectThread(
     device: BluetoothDevice,
     val lineBreak: LineBreak,
@@ -72,23 +66,6 @@ class ConnectThread(
         var CrReaded = false
         while (true) {
             try {
-//                val msg = String(buffer, 0, len ?: 0)
-//                val len = socket?.inputStream?.read(buffer)!!
-//                Log.d("ConnectThread#readMessage", buffer.joinToString(";"))
-//
-//                if(len > 2 && lineBreak == LineBreak.CR_LF && buffer[len-2] == 13.toByte() && buffer[len-1] == 10.toByte()){
-//                    val msg = String(buffer, 0, len - 2)
-//                    onReceiveMessage(msg)
-//
-//                }else if(len > 1 && lineBreak == LineBreak.CR && buffer[len-1] == 13.toByte() ||
-//                        len > 1 && lineBreak == LineBreak.LF && buffer[len-1] == 10.toByte()) {
-//                    val msg = String(buffer, 0, len - 1)
-//                    onReceiveMessage(msg)
-//
-//                }else if(lineBreak == LineBreak.NONE){
-//                    val msg = String(buffer, 0, len)
-//                    onReceiveMessage(msg)
-//                }
                 val msg = socket?.inputStream?.read()!!
 
                 if(msg != 13 && msg != 10) buffer.add(msg.toByte())

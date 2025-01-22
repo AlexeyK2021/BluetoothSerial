@@ -71,6 +71,7 @@ fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
                 bluetoothViewModel.setMac(mac)
                 bluetoothViewModel.setDeviceName(name)
             },
+//             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
         Spacer(Modifier.height(25.dp))
@@ -79,6 +80,7 @@ fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
             initValue = if (currConnection.deviceMac.isNotEmpty()) currConnection.lineBreak else LineBreak.CR_LF,
             items = LineBreak.entries,
             onSelectItem = { bluetoothViewModel.setLineBreak(it) },
+//            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
         Row(modifier = Modifier.padding(top = 25.dp)) {

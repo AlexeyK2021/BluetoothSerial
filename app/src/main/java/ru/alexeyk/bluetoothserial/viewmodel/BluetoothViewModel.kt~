@@ -112,4 +112,5 @@ class BluetoothViewModel(private val btAdapter: BluetoothAdapter) : ViewModel() 
     fun clearMessaged() {
         _messages.value = listOf()
     }
+
 }
