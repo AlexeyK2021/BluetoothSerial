@@ -106,7 +106,7 @@ fun TextPanel(
             modifier = modifier
                 .weight(0.75f)
                 .fillMaxHeight(),
-            onValueChange = { textValue.value = it })
+            onValueChange = { textValue.value = it }, )
 
         Button(
             modifier = modifier
