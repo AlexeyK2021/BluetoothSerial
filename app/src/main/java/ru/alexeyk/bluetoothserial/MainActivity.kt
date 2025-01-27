@@ -49,6 +49,7 @@ import ru.alexeyk.bluetoothserial.viewmodel.BluetoothViewModelFactory
 class MainActivity : ComponentActivity() {
     private var btAdapter: BluetoothAdapter? = null
     private lateinit var btLauncher: ActivityResultLauncher<Intent>
+    private val viewModel: BluetoothViewModel by viewModels { BluetoothViewModelFactory(btAdapter!!) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +58,6 @@ class MainActivity : ComponentActivity() {
         registerBtLauncher()
         initBtAdapter()
 
-        val viewModel: BluetoothViewModel by viewModels { BluetoothViewModelFactory(btAdapter!!) }
         setContent {
             BluetoothSerial {
                 App(viewModel)
@@ -75,11 +75,10 @@ class MainActivity : ComponentActivity() {
 
     private fun registerBtLauncher() {
         btLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                Toast.makeText(this, getString(R.string.bluetooth_is_enabled), Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, getString(R.string.bluetooth_is_not_enabled), Toast.LENGTH_SHORT).show()
+            if (result.resultCode != RESULT_OK) {
                 btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
+            }else{
+                viewModel.updatePairedDevices()
             }
         }
     }
@@ -91,7 +90,7 @@ class MainActivity : ComponentActivity() {
         if (btAdapter == null) {
             Toast.makeText(this, getString(R.string.bluetooth_is_not_available), Toast.LENGTH_SHORT).show()
         } else if (!btAdapter!!.isEnabled) {
-            Toast.makeText(this, getString(R.string.bluetooth_is_not_enabled), Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, getString(R.string.bluetooth_is_not_enabled), Toast.LENGTH_SHORT).show()
             btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
         }
     }
