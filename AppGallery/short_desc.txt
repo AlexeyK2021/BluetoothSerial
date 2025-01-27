@@ -1,0 +1,3 @@
+Bluetooth Serial – это инструмент для работы с устройствами Bluetooth SPP
+
+Bluetooth Serial is a tool for working with Bluetooth SPP devices

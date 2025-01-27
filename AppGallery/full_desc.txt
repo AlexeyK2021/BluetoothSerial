@@ -1,0 +1,27 @@
+Приложение Bluetooth Serial – это удобный инструмент для работы с устройствами, поддерживающими последовательную передачу данных через Bluetooth.
+
+Основные возможности:
+1. Подключение к устройствам через Serial over Bluetooth.
+2. Настройка стоповых битов и выбор из сопряженных устройств.
+3. Просмотр и отправка текстовых данных в режиме реального времени.
+
+Для кого это приложение?
+Это приложение идеально подходит для разработчиков, инженеров, специалистов по настройке оборудования и любителей электроники, работающих с микроконтроллерами, датчиками и другими устройствами с интерфейсом Bluetooth Serial.
+
+Интуитивно понятный интерфейс позволяет быстро настроить подключение и начать обмен данными. Используйте приложение для диагностики, отладки и управления вашими устройствами.
+
+Попробуйте сейчас и откройте новые возможности работы с Bluetooth Serial портами!
+
+The Bluetooth Serial application is a handy tool for working with devices that support serial data transmission via Bluetooth.
+
+Main features:
+1. Connect to devices via Serial over Bluetooth.
+2. Set the stop bits and select from the paired devices.
+3. View and send text data in real time.
+
+Who is this app for?
+This app is ideal for developers, engineers, hardware setup specialists, and electronics enthusiasts working with microcontrollers, sensors, and other Bluetooth Serial devices.
+
+The intuitive interface allows you to quickly set up a connection and start data exchange. Use the app to diagnose, debug, and manage your devices.
+
+Try it now and discover new possibilities of working with Bluetooth Serial ports!
