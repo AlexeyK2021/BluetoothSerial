@@ -1,6 +1,10 @@
 package ru.alexeyk.bluetoothserial.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -48,7 +53,12 @@ fun MessagesScreen(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        ShowMessages(msgs, modifier.fillMaxWidth().weight(1f, fill = false))
+        ShowMessages(
+            msgs,
+            modifier
+                .fillMaxWidth()
+                .weight(1f, fill = false)
+        )
         Spacer(modifier = modifier)
         TextPanel(
             onSendButtonClicked = { bluetoothViewModel.sendMessage(it) },
@@ -81,6 +91,7 @@ fun ShowMessages(messagesList: List<Message>?, modifier: Modifier = Modifier) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TextPanel(
     onSendButtonClicked: (String) -> Unit,
@@ -102,11 +113,13 @@ fun TextPanel(
 //            Icon(Icons.Default.Delete, contentDescription = "Clear chat")
 //        }
         val textValue = remember { mutableStateOf("") }
-        TextField(textValue.value,
+        TextField(
+            textValue.value,
             modifier = modifier
                 .weight(0.75f)
                 .fillMaxHeight(),
-            onValueChange = { textValue.value = it }, )
+            onValueChange = { textValue.value = it },
+        )
 
         Button(
             modifier = modifier

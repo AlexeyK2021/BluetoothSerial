@@ -56,7 +56,6 @@ fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
     val devices = bluetoothViewModel.bluetoothDeviceSet.observeAsState().value?.toList()
     val currConnection = bluetoothViewModel.currConnection
     val connect = bluetoothViewModel.currentState.observeAsState()
-
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -136,7 +135,7 @@ fun ConnectionSettingsScreen(bluetoothViewModel: BluetoothViewModel) {
 //        }
         Spacer(Modifier.height(25.dp))
         BluetoothDevicesList(
-            devices.value.toList(),
+            devices = devices ?: listOf(),
             currConnection,
             connect.value ?: BluetoothConnectionState.DISCONNECTED,
             onSelectItem = { address, name ->
