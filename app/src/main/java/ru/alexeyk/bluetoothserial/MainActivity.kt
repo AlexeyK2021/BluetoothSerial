@@ -18,21 +18,16 @@ import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material.icons.sharp.Email
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
@@ -44,9 +39,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.compose.AppTheme
 import ru.alexeyk.bluetoothserial.screens.ConnectionSettingsScreen
 import ru.alexeyk.bluetoothserial.screens.MessagesScreen
+import ru.alexeyk.bluetoothserial.ui.theme.BluetoothSerial
 import ru.alexeyk.bluetoothserial.viewmodel.BluetoothViewModel
 import ru.alexeyk.bluetoothserial.viewmodel.BluetoothViewModelFactory
 
@@ -54,6 +49,7 @@ import ru.alexeyk.bluetoothserial.viewmodel.BluetoothViewModelFactory
 class MainActivity : ComponentActivity() {
     private var btAdapter: BluetoothAdapter? = null
     private lateinit var btLauncher: ActivityResultLauncher<Intent>
+    private val viewModel: BluetoothViewModel by viewModels { BluetoothViewModelFactory(btAdapter!!) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,9 +58,8 @@ class MainActivity : ComponentActivity() {
         registerBtLauncher()
         initBtAdapter()
 
-        val viewModel: BluetoothViewModel by viewModels { BluetoothViewModelFactory(btAdapter!!) }
         setContent {
-            AppTheme {
+            BluetoothSerial {
                 App(viewModel)
             }
         }
@@ -80,11 +75,10 @@ class MainActivity : ComponentActivity() {
 
     private fun registerBtLauncher() {
         btLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                Toast.makeText(this, getString(R.string.bluetooth_is_enabled), Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, getString(R.string.bluetooth_is_not_enabled), Toast.LENGTH_SHORT).show()
+            if (result.resultCode != RESULT_OK) {
                 btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
+            }else{
+                viewModel.updatePairedDevices()
             }
         }
     }
@@ -96,7 +90,7 @@ class MainActivity : ComponentActivity() {
         if (btAdapter == null) {
             Toast.makeText(this, getString(R.string.bluetooth_is_not_available), Toast.LENGTH_SHORT).show()
         } else if (!btAdapter!!.isEnabled) {
-            Toast.makeText(this, getString(R.string.bluetooth_is_not_enabled), Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, getString(R.string.bluetooth_is_not_enabled), Toast.LENGTH_SHORT).show()
             btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
         }
     }

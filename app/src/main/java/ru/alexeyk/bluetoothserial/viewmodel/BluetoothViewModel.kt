@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.util.Log
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import ru.alexeyk.bluetoothserial.ConnectThread
 import ru.alexeyk.bluetoothserial.screens.LineBreak
 import ru.alexeyk.bluetoothserial.model.Connection
@@ -19,6 +21,7 @@ enum class BluetoothConnectionState {
     FAILED_TO_SEND_MSG
 }
 
+@SuppressLint("MissingPermission")
 class BluetoothViewModel(private val btAdapter: BluetoothAdapter) : ViewModel() {
 
     private val _messages: MutableLiveData<List<Message>> = MutableLiveData(listOf())
@@ -32,6 +35,9 @@ class BluetoothViewModel(private val btAdapter: BluetoothAdapter) : ViewModel() 
     var currentState: MutableLiveData<BluetoothConnectionState> =
         MutableLiveData(BluetoothConnectionState.DISCONNECTED)
 
+    private var _bluetoothDeviceSet: MutableLiveData<Set<BluetoothDevice>> = MutableLiveData()
+    val bluetoothDeviceSet: MutableLiveData<Set<BluetoothDevice>> get() = _bluetoothDeviceSet
+
 //    fun sendMessage(message: String) {
 //        val msg = Message(message, Time(System.currentTimeMillis()), false)
 //        _messages.value = _messages.value!!.plus(msg)
@@ -41,6 +47,10 @@ class BluetoothViewModel(private val btAdapter: BluetoothAdapter) : ViewModel() 
 //        Log.d("BluetoothViewModel", "setBaudRate: $baudRate")
 //        currentConnection.baudRate = baudRate
 //    }
+
+    init {
+        updatePairedDevices()
+    }
 
     fun setMac(mac: String) {
         Log.d("BluetoothViewModel", "setMAC: $mac")
@@ -61,6 +71,10 @@ class BluetoothViewModel(private val btAdapter: BluetoothAdapter) : ViewModel() 
     }
 
     fun connect() {
+        if (connectThread?.isAlive == true) {
+            connectThread?.closeConnection(); return
+        }
+
         if (btAdapter.isEnabled && currentConnection.deviceMac.isNotEmpty()) {
             Log.d("BluetoothViewModel", "connect: ${currentConnection.deviceMac}")
             val device = btAdapter.getRemoteDevice(currentConnection.deviceMac)
@@ -87,7 +101,7 @@ class BluetoothViewModel(private val btAdapter: BluetoothAdapter) : ViewModel() 
     fun sendMessage(message: String) {
         val sb = StringBuilder(message)
         sb.append(
-            when(currentConnection.lineBreak){
+            when (currentConnection.lineBreak) {
                 LineBreak.CR_LF -> "\r\n"
                 LineBreak.CR -> "\r"
                 LineBreak.LF -> "\n"
@@ -103,10 +117,15 @@ class BluetoothViewModel(private val btAdapter: BluetoothAdapter) : ViewModel() 
         connectThread?.closeConnection()
     }
 
-    @SuppressLint("MissingPermission")
-    fun getPairedDevices(): Set<BluetoothDevice> {
-        val pairedDevices: Set<BluetoothDevice> = btAdapter.bondedDevices as Set<BluetoothDevice>
-        return pairedDevices
+//    @SuppressLint("MissingPermission")
+//    fun getPairedDevices(): Set<BluetoothDevice> {
+////        val pairedDevices: Set<BluetoothDevice> = btAdapter.bondedDevices as Set<BluetoothDevice>
+////        return pairedDevices
+//        return _bluetoothDeviceSet.value!!
+//    }
+
+    fun updatePairedDevices() {
+        _bluetoothDeviceSet.value = btAdapter.bondedDevices as Set<BluetoothDevice>
     }
 
     fun clearMessaged() {
