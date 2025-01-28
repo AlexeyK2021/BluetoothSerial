@@ -71,6 +71,7 @@ class BluetoothViewModel(private val btAdapter: BluetoothAdapter) : ViewModel() 
     }
 
     fun connect() {
+        _messages.value = listOf()
         if (connectThread?.isAlive == true) {
             connectThread?.closeConnection(); return
         }

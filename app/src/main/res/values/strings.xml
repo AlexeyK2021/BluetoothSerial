@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">Bluetooth Serial</string>
-    <string name="messages_screen_title">Messages Screen</string>
-    <string name="connection_settings_screen_title">Connection Settings</string>
+    <string name="messages_screen_title">Messages</string>
+    <string name="connection_settings_screen_title">Connection</string>
     <string name="baud_rate">Baud rate</string>
     <string name="bluetooth_device_mac">Bluetooth device MAC</string>
     <string name="bluetooth_is_enabled">Bluetooth is enabled</string>

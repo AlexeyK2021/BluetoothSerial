@@ -49,7 +49,7 @@ class BluetoothViewModel(private val btAdapter: BluetoothAdapter) : ViewModel() 
 //    }
 
     init {
-        _bluetoothDeviceSet.value = btAdapter.bondedDevices as Set<BluetoothDevice>
+        updatePairedDevices()
     }
 
     fun setMac(mac: String) {
